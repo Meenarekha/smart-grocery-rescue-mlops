@@ -1,0 +1,104 @@
+{
+    "items": [
+        {
+            "food": "banana",
+            "display_name": "BANANAS",
+            "status": "Fully Used",
+            "purchase_date": "2026-03-15",
+            "expiry_date": "2026-03-20",
+            "last_updated": "2026-09-26 21:29:48"
+        },
+        {
+            "food": "milk",
+            "display_name": "WHOLE MILK GAL",
+            "status": "Partially Used",
+            "purchase_date": "2026-03-15",
+            "expiry_date": "2026-03-20",
+            "last_updated": "2026-09-26 21:29:56"
+        },
+        {
+            "food": "egg",
+            "display_name": "PC LARGE EGGS",
+            "status": "Available",
+            "purchase_date": "2026-03-15",
+            "expiry_date": "2026-04-05",
+            "last_updated": "2026-09-26 21:30:07"
+        },
+        {
+            "food": "bread",
+            "display_name": "WHEAT BREAD",
+            "status": "Discarded",
+            "purchase_date": "2026-03-15",
+            "expiry_date": "2026-03-22",
+            "last_updated": "2026-09-26 21:30:29"
+        },
+        {
+            "food": "pepsi",
+            "display_name": "PEPSI",
+            "status": "Partially Used",
+            "purchase_date": "2026-03-15",
+            "expiry_date": "2026-09-11",
+            "last_updated": "2026-09-26 21:30:19"
+        },
+        {
+            "id": "GR-1a6590dcdb19-001",
+            "receipt_id": "1a6590dcdb19",
+            "food": "BANANAS",
+            "standard_food": "banana",
+            "purchase_date": "2026-03-15",
+            "shelf_life_days": 5,
+            "storage": "room",
+            "expiry_date": "2026-03-20",
+            "status": "Available",
+            "created_at": "2026-09-26 21:51:05"
+        },
+        {
+            "id": "GR-1a6590dcdb19-002",
+            "receipt_id": "1a6590dcdb19",
+            "food": "WHOLE MILK GAL",
+            "standard_food": "milk",
+            "purchase_date": "2026-03-15",
+            "shelf_life_days": 5,
+            "storage": "refrigerator",
+            "expiry_date": "2026-03-20",
+            "status": "Available",
+            "created_at": "2026-09-26 21:51:05"
+        },
+        {
+            "id": "GR-1a6590dcdb19-003",
+            "receipt_id": "1a6590dcdb19",
+            "food": "PC LARGE EGGS",
+            "standard_food": "egg",
+            "purchase_date": "2026-03-15",
+            "shelf_life_days": 21,
+            "storage": "refrigerator",
+            "expiry_date": "2026-04-05",
+            "status": "Available",
+            "created_at": "2026-09-26 21:51:05"
+        },
+        {
+            "id": "GR-1a6590dcdb19-004",
+            "receipt_id": "1a6590dcdb19",
+            "food": "WHEAT BREAD",
+            "standard_food": "bread",
+            "purchase_date": "2026-03-15",
+            "shelf_life_days": 7,
+            "storage": "room",
+            "expiry_date": "2026-03-22",
+            "status": "Available",
+            "created_at": "2026-09-26 21:51:05"
+        },
+        {
+            "id": "GR-1a6590dcdb19-005",
+            "receipt_id": "1a6590dcdb19",
+            "food": "PEPSI",
+            "standard_food": "pepsi",
+            "purchase_date": "2026-03-15",
+            "shelf_life_days": 180,
+            "storage": "room",
+            "expiry_date": "2026-09-11",
+            "status": "Available",
+            "created_at": "2026-09-26 21:51:05"
+        }
+    ]
+}
