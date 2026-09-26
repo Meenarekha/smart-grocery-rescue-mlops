@@ -37,6 +37,12 @@ jobs:
         run: |
           pip install "dvc[http]"
 
+      - name: Configure DVC credentials
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user Meena
+          dvc remote modify origin --local password "${{ secrets.DAGSHUB_USER_TOKEN }}"
+
       - name: Pull DVC data
         run: |
           dvc pull -r origin
