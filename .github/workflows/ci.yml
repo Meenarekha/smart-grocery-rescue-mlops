@@ -43,6 +43,16 @@ jobs:
           dvc remote modify origin --local user Meena
           dvc remote modify origin --local password "${{ secrets.DAGSHUB_USER_TOKEN }}"
 
+      - name: Verify DVC credentials
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.DAGSHUB_USER_TOKEN }}" ]; then
+            echo "DAGSHUB_USER_TOKEN is configured."
+          else
+            echo "DAGSHUB_USER_TOKEN is NOT configured."
+            exit 1
+          fi
+
       - name: Pull DVC data
         run: |
           dvc pull -r origin
