@@ -1,0 +1,30 @@
+# Virtual environment
+grocery_rescue/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment variables
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Local data
+data/raw/
+data/processed/
+
+# Trained models
+models/
+
+# Artifacts
+artifacts/
+
+# OS files
+.DS_Store
+Thumbs.db
