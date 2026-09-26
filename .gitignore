@@ -30,3 +30,5 @@ artifacts/
 Thumbs.db
 
 *.png
+# Local MLflow database
+mlflow.db
