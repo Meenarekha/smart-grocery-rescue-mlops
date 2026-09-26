@@ -40,7 +40,8 @@ def parse_receipt_items(ocr_results):
     "CASH",
     "FOR",
     "YOU SAVED",
-    "CANS"
+    "CANS",
+    "MARI"
     ]
 
     for result in ocr_results:
