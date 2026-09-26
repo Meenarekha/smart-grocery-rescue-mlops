@@ -1,0 +1,6 @@
+.git
+.github
+grocery_rescue
+__pycache__
+*.pyc
+.pytest_cache
