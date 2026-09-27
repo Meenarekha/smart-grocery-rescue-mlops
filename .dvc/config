@@ -1,2 +1,4 @@
+[core]
+    remote = origin
 ['remote "origin"']
     url = https://dagshub.com/Meena/smart-grocery-rescue-mlops.dvc
