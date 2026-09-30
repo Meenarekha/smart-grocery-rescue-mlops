@@ -2,18 +2,13 @@
 SMART GROCERY RESCUE SYSTEM
 Production Streamlit Application
 """
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
 import hashlib
 import io
 import json
 import re
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -21,6 +16,29 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from PIL import Image
+
+
+# ---------------------------------------------------------------------------
+# Project Root / Python Import Path
+# ---------------------------------------------------------------------------
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
+# ---------------------------------------------------------------------------
+# Streamlit Configuration
+# ---------------------------------------------------------------------------
+
+st.set_page_config(
+    page_title="Smart Grocery Rescue System",
+    page_icon="🥦",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 
 # ---------------------------------------------------------------------------
 # Pipeline Imports
@@ -46,7 +64,7 @@ from src.recommendation.recipe_recommender import RecipeRecommender
 # Project Paths
 # ---------------------------------------------------------------------------
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = PROJECT_ROOT
 
 INVENTORY_FILE = (
     BASE_DIR
@@ -64,15 +82,207 @@ FEEDBACK_FILE = (
 
 
 # ---------------------------------------------------------------------------
-# Streamlit Configuration
+# DVC / DagsHub Deployment Bootstrap
 # ---------------------------------------------------------------------------
 
-st.set_page_config(
-    page_title="Smart Grocery Rescue System",
-    page_icon="🥦",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+def ensure_processed_data():
+    """
+    Ensure DVC-managed processed datasets are available.
+
+    Locally:
+        If the datasets already exist, nothing is downloaded.
+
+    Streamlit Cloud:
+        If the datasets are missing, authenticate to the DagsHub DVC
+        remote using Streamlit Secrets and pull data/processed.dvc.
+    """
+
+    required_files = [
+        BASE_DIR
+        / "data"
+        / "processed"
+        / "shelf_life_processed.csv",
+
+        BASE_DIR
+        / "data"
+        / "processed"
+        / "recipes_processed.csv",
+
+        BASE_DIR
+        / "data"
+        / "processed"
+        / "nutrition_processed.csv",
+    ]
+
+    # ---------------------------------------------------------------
+    # Data already exists
+    # ---------------------------------------------------------------
+
+    if all(file.exists() for file in required_files):
+        return
+
+    # ---------------------------------------------------------------
+    # Data missing
+    # ---------------------------------------------------------------
+
+    try:
+        dagshub_user = st.secrets["DAGSHUB_USER"]
+        dagshub_token = st.secrets["DAGSHUB_USER_TOKEN"]
+
+    except Exception:
+        st.error(
+            "Application data is unavailable because the "
+            "DagsHub credentials are not configured."
+        )
+
+        st.info(
+            "Add DAGSHUB_USER and DAGSHUB_USER_TOKEN "
+            "to Streamlit Cloud Secrets."
+        )
+
+        st.stop()
+
+    try:
+
+        # -----------------------------------------------------------
+        # Configure DagsHub DVC remote authentication locally
+        # -----------------------------------------------------------
+
+        subprocess.run(
+            [
+                "dvc",
+                "remote",
+                "modify",
+                "origin",
+                "--local",
+                "auth",
+                "basic",
+            ],
+            cwd=BASE_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        subprocess.run(
+            [
+                "dvc",
+                "remote",
+                "modify",
+                "origin",
+                "--local",
+                "user",
+                dagshub_user,
+            ],
+            cwd=BASE_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        subprocess.run(
+            [
+                "dvc",
+                "remote",
+                "modify",
+                "origin",
+                "--local",
+                "password",
+                dagshub_token,
+            ],
+            cwd=BASE_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        # -----------------------------------------------------------
+        # Pull processed datasets from DagsHub
+        # -----------------------------------------------------------
+
+        result = subprocess.run(
+            [
+                "dvc",
+                "pull",
+                "data/processed.dvc",
+                "-r",
+                "origin",
+            ],
+            cwd=BASE_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        # -----------------------------------------------------------
+        # Verify required files after DVC pull
+        # -----------------------------------------------------------
+
+        missing_files = [
+            str(file.relative_to(BASE_DIR))
+            for file in required_files
+            if not file.exists()
+        ]
+
+        if missing_files:
+
+            st.error(
+                "DVC pull completed, but required application "
+                "data files are still missing."
+            )
+
+            st.code(
+                "\n".join(missing_files)
+            )
+
+            st.stop()
+
+    except subprocess.CalledProcessError as error:
+
+        st.error(
+            "Unable to download application data from DagsHub."
+        )
+
+        if error.stdout:
+            st.code(
+                error.stdout
+            )
+
+        if error.stderr:
+            st.code(
+                error.stderr
+            )
+
+        st.stop()
+
+    except FileNotFoundError:
+
+        st.error(
+            "DVC is not installed in the deployment environment."
+        )
+
+        st.info(
+            "Add 'dvc' to requirements.txt and redeploy."
+        )
+
+        st.stop()
+
+    except Exception as error:
+
+        st.error(
+            "Unexpected error while loading application data."
+        )
+
+        st.exception(error)
+
+        st.stop()
+
+
+# ---------------------------------------------------------------------------
+# Ensure DVC Data Exists Before Services Load
+# ---------------------------------------------------------------------------
+
+ensure_processed_data()
 
 
 # ---------------------------------------------------------------------------
@@ -128,6 +338,7 @@ def get_emoji_for_food(food_name: str) -> str:
     cleaned = str(food_name).lower().strip()
 
     for key, icon in CATEGORY_EMOJI_MAP.items():
+
         if key in cleaned:
             return icon
 
@@ -141,12 +352,22 @@ def get_expiry_status(expiry_date: str) -> dict:
     Inventory status (Available / Partially Used / Fully Used / Discarded)
     remains independent from expiry condition.
     """
+
     try:
-        expiry = datetime.strptime(str(expiry_date), "%d/%m/%Y").date()
+
+        expiry = datetime.strptime(
+            str(expiry_date),
+            "%d/%m/%Y",
+        ).date()
+
         today = datetime.now().date()
-        days_left = (expiry - today).days
+
+        days_left = (
+            expiry - today
+        ).days
 
         if days_left < 0:
+
             return {
                 "label": "Expired",
                 "days_left": days_left,
@@ -154,6 +375,7 @@ def get_expiry_status(expiry_date: str) -> dict:
             }
 
         if days_left == 0:
+
             return {
                 "label": "Expires Today",
                 "days_left": 0,
@@ -161,6 +383,7 @@ def get_expiry_status(expiry_date: str) -> dict:
             }
 
         if days_left <= 3:
+
             return {
                 "label": "Expiring Soon",
                 "days_left": days_left,
@@ -174,6 +397,7 @@ def get_expiry_status(expiry_date: str) -> dict:
         }
 
     except (TypeError, ValueError):
+
         return {
             "label": "Unknown",
             "days_left": None,
@@ -192,11 +416,13 @@ def load_inventory():
         return []
 
     try:
+
         with open(
             INVENTORY_FILE,
             "r",
             encoding="utf-8",
         ) as file:
+
             data = json.load(file)
 
         if isinstance(data, list):
@@ -205,6 +431,7 @@ def load_inventory():
         return []
 
     except Exception:
+
         return []
 
 
@@ -221,6 +448,7 @@ def save_inventory(items):
         "w",
         encoding="utf-8",
     ) as file:
+
         json.dump(
             items,
             file,
@@ -258,7 +486,12 @@ def extract_purchase_date(ocr_results):
 
     for result in ocr_results:
 
-        text = str(result.get("text", ""))
+        text = str(
+            result.get(
+                "text",
+                "",
+            )
+        )
 
         match = date_pattern.search(text)
 
@@ -273,25 +506,31 @@ def extract_purchase_date(ocr_results):
             year += 2000
 
         try:
+
             date_obj = datetime(
                 year,
                 month,
                 day,
             )
 
-            return date_obj.strftime("%d/%m/%Y")
+            return date_obj.strftime(
+                "%d/%m/%Y"
+            )
 
         except ValueError:
+
             continue
 
     return None
 
 
-# ---------------------------------------------------------------------------
-# Navigation
-# ---------------------------------------------------------------------------
+# =============================================================================
+# NAVIGATION
+# =============================================================================
 
-st.sidebar.title("🥦 Grocery Rescue")
+st.sidebar.title(
+    "🥦 Grocery Rescue"
+)
 
 app_mode = st.sidebar.radio(
     "Navigation Console",
@@ -370,7 +609,10 @@ if app_mode == "Active Kitchen & Recipes":
         try:
 
             expiry_date = datetime.strptime(
-                item.get("expiry_date", ""),
+                item.get(
+                    "expiry_date",
+                    "",
+                ),
                 "%d/%m/%Y",
             )
 
@@ -380,9 +622,13 @@ if app_mode == "Active Kitchen & Recipes":
             ).days
 
             if days_left < 0:
-                expired_active.append(item)
+
+                expired_active.append(
+                    item
+                )
 
             elif 0 <= days_left <= 3:
+
                 expiring_soon.append(
                     (
                         item,
@@ -391,6 +637,7 @@ if app_mode == "Active Kitchen & Recipes":
                 )
 
         except Exception:
+
             continue
 
     if expired_active:
@@ -408,7 +655,10 @@ if app_mode == "Active Kitchen & Recipes":
         )
 
         columns = st.columns(
-            min(len(expiring_soon), 3)
+            min(
+                len(expiring_soon),
+                3,
+            )
         )
 
         for index, (
@@ -431,7 +681,9 @@ if app_mode == "Active Kitchen & Recipes":
     # Current Stock
     # -------------------------------------------------------------------------
 
-    st.subheader("Current Stock")
+    st.subheader(
+        "Current Stock"
+    )
 
     if not active_groceries:
 
@@ -500,26 +752,42 @@ if app_mode == "Active Kitchen & Recipes":
                 )
 
                 expiry_info = get_expiry_status(
-                    item.get("expiry_date", "")
+                    item.get(
+                        "expiry_date",
+                        "",
+                    )
                 )
 
                 if expiry_info["label"] == "Expired":
-                    st.error("🔴 Expired")
+
+                    st.error(
+                        "🔴 Expired"
+                    )
 
                 elif expiry_info["label"] == "Expires Today":
-                    st.error("🔴 Expires Today")
+
+                    st.error(
+                        "🔴 Expires Today"
+                    )
 
                 elif expiry_info["label"] == "Expiring Soon":
+
                     st.warning(
                         f"🟠 Expiring Soon · "
                         f"{expiry_info['days_left']} day(s)"
                     )
 
                 elif expiry_info["label"] == "Fresh":
-                    st.success("🟢 Fresh")
+
+                    st.success(
+                        "🟢 Fresh"
+                    )
 
                 else:
-                    st.caption("⚪ Expiry unavailable")
+
+                    st.caption(
+                        "⚪ Expiry unavailable"
+                    )
 
             # Inventory status
             with col4:
@@ -545,6 +813,7 @@ if app_mode == "Active Kitchen & Recipes":
                 )
 
                 if current_status not in statuses:
+
                     current_status = "Available"
 
                 new_status = st.selectbox(
@@ -571,7 +840,9 @@ if app_mode == "Active Kitchen & Recipes":
 
                             break
 
-                    save_inventory(inventory)
+                    save_inventory(
+                        inventory
+                    )
 
                     st.rerun()
 
@@ -685,9 +956,11 @@ if app_mode == "Active Kitchen & Recipes":
                         )
 
                     # Feedback
-                    feedback_col1, feedback_col2, feedback_col3 = (
-                        st.columns(3)
-                    )
+                    (
+                        feedback_col1,
+                        feedback_col2,
+                        feedback_col3,
+                    ) = st.columns(3)
 
                     with feedback_col1:
 
@@ -836,7 +1109,6 @@ elif app_mode == "Receipt Scanner":
 
                         st.write(
                             f"{result['text']} "
-                            f""
                             f"(confidence: "
                             f"{result['confidence']})"
                         )
@@ -941,10 +1213,9 @@ elif app_mode == "Receipt Scanner":
                     parsed_groceries
                 ):
 
-                    clean_name = (
-                        str(grocery_item)
-                        .strip()
-                    )
+                    clean_name = str(
+                        grocery_item
+                    ).strip()
 
                     # Find shelf-life information
                     shelf_info = get_shelf_life(
@@ -1179,6 +1450,7 @@ elif app_mode == "Waste Analytics & History":
                 )
 
         except Exception:
+
             continue
 
     if expired_records:
