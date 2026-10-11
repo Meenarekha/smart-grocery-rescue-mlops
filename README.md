@@ -630,7 +630,7 @@ This project demonstrates practical experience with:
 
 ## 👩‍💻 16. Author
 
-**Meenarekha E**
+**Meena E**
 
 Artificial Intelligence and Data Science | Machine Learning | MLOps
 
