@@ -1,91 +1,114 @@
-# 🥦 Smart Grocery Rescue System — MLOps-Based Food Waste Reduction
+# 🥦 Smart Grocery Rescue — An End-to-End MLOps Project
 
-An intelligent grocery management application that helps users reduce food waste through receipt OCR, expiry-date tracking, nutrition estimation, and expiry-aware recipe recommendations. The project integrates machine learning and MLOps tools to support model development, dataset versioning, testing, and containerization.
+**An intelligent grocery management system designed to reduce household food waste through receipt OCR, expiry tracking, nutrition estimation, recipe recommendations, and machine learning.**
 
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit)](https://streamlit.io/)
+[![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker)](https://www.docker.com/)
+[![MLflow](https://img.shields.io/badge/Experiment_Tracking-MLflow-0194E2?logo=mlflow)](https://mlflow.org/)
+[![DVC](https://img.shields.io/badge/Data_Versioning-DVC-945DD6)](https://dvc.org/)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions)](https://github.com/features/actions)
 
-## 📌 Project Overview
+**Repository:** [GitHub](https://github.com/Meenarekha/smart-grocery-rescue-mlops) | **MLOps Platform:** [DagsHub](https://dagshub.com/Meena/smart-grocery-rescue-mlops)
 
-Food waste is a major challenge for households. Groceries are often discarded because users forget their expiry dates or struggle to decide what to cook with the ingredients they already have.
+---
 
-The **Smart Grocery Rescue System** addresses this problem by providing a centralized application for grocery inventory management, receipt processing, expiry monitoring, and recipe recommendations.
+## 📌 1. Project Overview
 
-The system combines OCR, machine learning, data processing, and MLOps practices in a modular Python application.
+Food waste is a significant household problem. Groceries are often thrown away because people forget expiry dates, purchase duplicate items, or do not know how to use the ingredients they already have.
+
+The **Smart Grocery Rescue System** provides an intelligent grocery management application that helps users track inventory, identify expiring food, estimate nutrition, and discover recipes based on available ingredients.
+
+The project combines a Streamlit application with machine learning components and an MLOps workflow for dataset versioning, experiment tracking, automated testing, and containerization.
 
 ### 🎯 Objectives
 
-- Automate grocery item extraction from uploaded receipts.
+- Automate grocery item extraction from receipt images.
 - Maintain a digital inventory of purchased groceries.
 - Estimate expiry dates using food-specific shelf-life information.
-- Alert users about groceries approaching expiry.
-- Recommend recipes based on available ingredients and urgency.
-- Provide approximate calorie information for supported food items.
+- Identify expired and soon-to-expire groceries.
+- Recommend recipes using available ingredients.
+- Estimate calories for supported grocery items.
 - Analyze grocery usage and waste-related information.
-- Apply MLOps practices for data versioning, experiment tracking, testing, and containerization.
+- Build a reproducible machine learning workflow.
+- Apply MLOps practices using DVC, DagsHub, MLflow, GitHub Actions, and Docker.
 
-## ✨ Key Features
+## ✨ 2. Key Features
 
-### 1. 🧾 Receipt Scanning and OCR
+### 🧾 Receipt OCR and Parsing
 
-- Upload receipt images for text extraction.
-- Use EasyOCR to recognize receipt text.
-- Parse recognized text into grocery items.
-- Normalize product names for shelf-life lookup.
-- Generate receipt hashes to help detect duplicate uploads.
+- Upload grocery receipt images.
+- Extract text using EasyOCR.
+- Parse receipt text into potential grocery items.
+- Normalize product names for downstream processing.
+- Generate receipt hashes to help identify duplicate uploads.
 
-### 2. 📦 Grocery Inventory Management
+### 📦 Grocery Inventory Management
 
-- Store grocery records in JSON files.
-- Track purchase dates, estimated expiry dates, storage types, and item status.
+- Maintain grocery records in JSON files.
+- Track purchase dates, expiry dates, storage types, and item status.
 - Update items as Available, Partially Used, Fully Used, or Discarded.
-- Maintain inventory information across application sessions.
+- Maintain inventory and recipe feedback across application sessions, subject to the storage environment.
 
-### 3. ⏰ Expiry Monitoring
+### ⏰ Expiry Monitoring
 
-- Calculate estimated expiry dates from purchase dates and shelf-life information.
-- Highlight groceries approaching expiry.
-- Identify items that should be prioritized for consumption.
-- Support expiry-aware inventory management.
+- Estimate expiry dates from purchase dates and shelf-life information.
+- Identify expired groceries based on their expiry dates.
+- Highlight groceries that need attention.
+- Help users prioritize food consumption.
 
-### 4. 🍲 Expiry-Aware Recipe Recommendations
+Expiry dates are estimates based on the configured shelf-life information and may not reflect actual food safety.
 
-- Recommend recipes using available grocery ingredients.
-- Calculate ingredient matches and missing ingredients.
-- Prioritize recipes based on ingredient availability and expiry urgency.
-- Display recipe match percentages and ingredient information.
+### 🍲 Expiry-Aware Recipe Recommendations
 
-### 5. 🥗 Nutrition and Calorie Estimation
+- Recommend recipes using available ingredients.
+- Calculate ingredient matches.
+- Identify missing ingredients.
+- Consider ingredient availability and expiry urgency when ranking recipes.
+- Display recipe suggestions through the Streamlit interface.
+
+### 🥗 Nutrition Estimation
 
 - Look up supported grocery items in the processed nutrition dataset.
-- Provide approximate calorie estimates for supported ingredients.
-- Use fallback nutrition values where configured.
+- Display approximate calorie information.
+- Use configured fallback values for certain unsupported items.
 
-*Nutrition estimates are approximate and are not a substitute for verified dietary information.*
+Nutrition values are estimates and may vary by brand, serving size, and preparation method.
 
-### 6. 📊 Waste Analytics and History
+### 📊 Waste Analytics Dashboard
 
-- Present grocery usage and waste-related information through the analytics interface.
-- Support inventory history and status-based analysis.
-- Use application inventory data to help users understand grocery consumption patterns.
+- Display inventory and grocery status information.
+- Visualize grocery usage and waste-related metrics.
+- Review inventory history.
+- Help users understand their grocery consumption patterns.
 
-### 7. 🤖 Machine Learning for Waste-Risk Prediction
+### 🤖 Machine Learning for Waste-Risk Prediction
 
-- Prepare a structured dataset for grocery waste-risk classification.
-- Train and compare Logistic Regression, Random Forest, and Gradient Boosting models.
-- Save the selected model for subsequent use.
-- Record model evaluation results.
+The project includes a supervised machine learning pipeline that prepares a structured dataset for grocery waste-risk classification.
 
-**Recorded development result:** Logistic Regression achieved 95.25% accuracy on the project's evaluation split. This is a development result, not a guarantee of real-world prediction performance.
+Models evaluated during development:
 
-### 8. ⚙️ MLOps and Deployment
+- Logistic Regression
+- Random Forest
+- Gradient Boosting
 
-- **DVC:** Version and manage datasets separately from ordinary Git files.
-- **MLflow:** Support experiment tracking workflows through the project's MLflow scripts.
-- **GitHub Actions:** Automate test execution through CI workflows.
-- **Docker:** Package the application and its runtime dependencies into a container.
-- **pytest:** Validate key application components through automated tests.
-- **DagsHub:** Host the Git repository and DVC remote.
+The training workflow compares model performance and saves the selected model and evaluation outputs according to the training script.
 
-## 🏗️ System Architecture
+**Recorded development result:** Logistic Regression achieved 95.25% accuracy on the evaluation split. This is a development result and does not establish performance on unseen real-world grocery data.
+
+### ⚙️ MLOps and Deployment
+
+- DVC for dataset versioning.
+- DagsHub for Git repository hosting and remote data storage.
+- MLflow for experiment-tracking workflows.
+- GitHub Actions for automated testing.
+- Docker for containerized execution.
+- pytest for automated tests.
+- Streamlit for the interactive user interface.
+
+---
+
+## 🏗️ 3. System Architecture
 
 ```mermaid
 flowchart TD
@@ -95,52 +118,71 @@ flowchart TD
     D --> E[Expiry and Shelf-Life Service]
     E --> F[JSON Grocery Inventory]
 
-    F --> G[Expiry Alerts]
+    F --> G[Expiry Monitoring]
     F --> H[Recipe Recommender]
     H --> I[Recipe Suggestions]
-
     F --> J[Nutrition Service]
     F --> K[Waste Analytics]
 
-    L[Food and Nutrition Datasets] --> M[Data Preprocessing]
-    M --> N[DVC Versioning]
-    M --> O[ML Dataset]
+    L[Raw Datasets] --> M[Data Preprocessing]
+    M --> N[DVC Dataset Versioning]
+    M --> O[Waste-Risk Dataset]
     O --> P[Model Training]
-    P --> Q[Waste-Risk Model]
-    P --> R[MLflow Workflows]
+    P --> Q[Selected ML Model]
+    P --> R[MLflow Experiment Workflow]
 
     G --> S[Streamlit Application]
     I --> S
     J --> S
     K --> S
 
-    S --> T[Docker Runtime]
-    T --> U[Cloud Deployment]
+    S --> T[Docker Container]
+    T --> U[Application Deployment]
 
     V[GitHub Repository] --> W[GitHub Actions CI]
     W --> X[Automated Tests]
+
+    V --> Y[DagsHub Git Remote]
+    N --> Z[DagsHub DVC Remote]
 ```
 
-## 🛠️ Technology Stack
+### Workflow Summary
 
-| Category             | Technologies                |
-| -------------------- | --------------------------- |
-| Programming language | Python                      |
-| User interface       | Streamlit                   |
-| OCR                  | EasyOCR, Pillow             |
-| Data processing      | Pandas, NumPy               |
-| Machine learning     | Scikit-learn                |
-| Model serialization  | Joblib                      |
-| Experiment tracking  | MLflow                      |
-| Data versioning      | DVC                         |
-| Remote data storage  | DagsHub                     |
-| Testing              | pytest                      |
-| Containerization     | Docker                      |
-| CI/CD                | GitHub Actions              |
-| Application storage  | JSON files and CSV datasets |
-| Version control      | Git and GitHub              |
+1. Receipt images are processed by the OCR and receipt-parsing modules.
+2. Extracted grocery items are normalized and added to the inventory.
+3. Shelf-life data is used to estimate expiry dates.
+4. Inventory information supports expiry monitoring, recipe recommendations, nutrition lookups, and analytics.
+5. Separate preprocessing and training scripts support the waste-risk classification pipeline.
+6. DVC manages versioned datasets, while DagsHub stores the configured remote data.
+7. MLflow supports experiment tracking through the project's training workflows.
+8. GitHub Actions runs automated tests.
+9. Docker packages the application and its dependencies for execution.
 
-## 📂 Project Structure
+---
+
+## 🛠️ 4. Technology Stack
+
+| Category | Technology |
+|---|---|
+| Programming language | Python 3.11 |
+| Frontend and dashboard | Streamlit |
+| OCR | EasyOCR |
+| Image processing | Pillow |
+| Data processing | Pandas, NumPy |
+| Machine learning | Scikit-learn |
+| Model serialization | Joblib |
+| Experiment tracking | MLflow |
+| Dataset versioning | DVC |
+| MLOps platform | DagsHub |
+| Automated testing | pytest |
+| CI/CD | GitHub Actions |
+| Containerization | Docker |
+| Application storage | JSON and CSV files |
+| Version control | Git and GitHub |
+
+---
+
+## 📂 5. Repository Structure
 
 ```text
 smart-grocery-rescue-mlops/
@@ -157,12 +199,13 @@ smart-grocery-rescue-mlops/
 │   │   ├── grocery_inventory.json
 │   │   └── recipe_feedback.json
 │   ├── ml/
+│   │   ├── .gitignore
 │   │   └── waste_risk_dataset.csv.dvc
+│   ├── raw/
+│   │   └── raw.dvc
 │   ├── processed/
-│   │   ├── nutrition_processed.csv
-│   │   ├── recipes_processed.csv
-│   │   └── shelf_life_processed.csv
-│   └── raw/
+│   │   └── processed.dvc
+│   └── processed.dvc
 │
 ├── models/
 │   └── waste_risk_model.pkl
@@ -181,6 +224,7 @@ smart-grocery-rescue-mlops/
 │   ├── models/
 │   │   ├── train_model.py
 │   │   ├── train_mlflow.py
+│   │   ├── train_mlflow_backup.py
 │   │   └── test_model.py
 │   ├── nutrition/
 │   │   └── nutrition_service.py
@@ -188,6 +232,10 @@ smart-grocery-rescue-mlops/
 │   │   ├── receipt_ocr.py
 │   │   └── receipt_parser.py
 │   ├── preprocessing/
+│   │   ├── preprocess_data.py
+│   │   ├── preprocess_nutrition.py
+│   │   ├── preprocess_shelf_life.py
+│   │   └── create_ml_dataset.py
 │   └── recommendation/
 │       └── recipe_recommender.py
 │
@@ -201,23 +249,25 @@ smart-grocery-rescue-mlops/
 ├── .dockerignore
 ├── .gitignore
 ├── Dockerfile
-├── dvc.yaml
 ├── requirements.txt
 └── README.md
 ```
 
-*Note: Some generated datasets and model artifacts may be managed locally or through DVC rather than stored directly in Git. The structure above summarizes the main project components.*
+*Note: This is a representative structure. DVC metadata files track data stored separately from Git. Actual raw datasets, processed files, and model artifacts may be available locally or through the configured remote rather than committed to Git.*
 
-## 🚀 Getting Started
+---
+
+## 🚀 6. Getting Started
 
 ### Prerequisites
 
-Install the following tools:
+Install:
 
 - Python 3.11
 - Git
-- Docker Desktop (for containerized execution)
-- DVC (for downloading versioned datasets)
+- Docker Desktop, if using Docker
+- DVC
+- Access to the configured DagsHub DVC remote when downloading remote datasets
 
 ### Step 1: Clone the Repository
 
@@ -226,18 +276,12 @@ git clone https://github.com/Meenarekha/smart-grocery-rescue-mlops.git
 cd smart-grocery-rescue-mlops
 ```
 
-### Step 2: Create a Virtual Environment
+### Step 2: Create and Activate a Virtual Environment
 
 **Windows PowerShell**
 
 ```powershell
 py -3.11 -m venv grocery_rescue
-.\grocery_rescue\Scripts\Activate.ps1
-```
-
-If PowerShell blocks activation, run:
-
-```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\grocery_rescue\Scripts\Activate.ps1
 ```
@@ -256,83 +300,234 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-The project includes CPU-specific PyTorch dependencies for OCR. Dependency compatibility may vary by Python version and deployment platform.
+The project uses CPU-specific PyTorch dependencies for OCR. Installation requirements can vary by operating system and deployment platform.
 
-### Step 4: Download DVC Data
+### Step 4: Retrieve Versioned Datasets
+
+Install DVC if it is not already available:
 
 ```bash
-dvc pull
+pip install "dvc[http]"
 ```
 
-If your repository uses the named DVC remote `origin`, run:
+Inspect the configured remote:
+
+```bash
+dvc remote list
+```
+
+Pull the versioned datasets:
 
 ```bash
 dvc pull -r origin
 ```
 
-Configure access credentials for the DagsHub DVC remote if prompted. Never commit access tokens or passwords.
+Configure DagsHub credentials if the remote requires authentication. Do not commit access tokens or passwords.
 
 ### Step 5: Run the Application
 
-From the repository root:
+Run from the repository root:
 
 ```bash
 python -m streamlit run src/app/app.py
 ```
 
-Open the local URL printed in your terminal, typically:
+Open the local URL shown in the terminal, typically:
 
-```text
 http://localhost:8501
-```
 
-## 🐳 Run with Docker
+---
 
-Docker provides a reproducible runtime without requiring manual activation of the Python virtual environment.
+## 🐳 7. Docker Deployment
 
-### Build the image
+Docker packages the application and its runtime dependencies into a container.
 
-From the repository root:
+### Build the Docker Image
+
+Run from the repository root:
 
 ```bash
 docker build -t smart-grocery-rescue .
 ```
 
-### Start the container
+### Start the Container
 
 ```bash
 docker run --rm -p 8501:8501 smart-grocery-rescue
 ```
 
-Open `http://localhost:8501` in your browser.
+Open:
 
-**Important:** Ensure that required processed datasets and model artifacts are available in the container. If any data files are excluded through `.dockerignore` or managed by DVC, retrieve or copy them as required before building the image.
+http://localhost:8501
 
-Application changes made to JSON files inside a disposable container may not persist after the container stops. Use a mounted volume or persistent storage when required.
+### Important Deployment Considerations
 
-## ☁️ Deploy on Streamlit Community Cloud
+- Make sure the processed datasets and required model artifacts are present before building or starting the container.
+- If datasets are managed by DVC, retrieve them before the build unless your container workflow explicitly downloads them.
+- The container must include all runtime dependencies used by the Streamlit application.
+- A disposable container may lose changes to its local JSON inventory when it stops. Use persistent storage or a mounted volume when persistence is required.
+- Do not bake secrets into the Docker image.
 
-1. Push the project to GitHub.
+---
 
-2. Open [Streamlit Community Cloud](https://share.streamlit.io/).
+## ☁️ 8. DagsHub Integration
 
-3. Connect your GitHub account and select this repository.
+[DagsHub](https://dagshub.com/) is the central MLOps platform used by this project for Git repository hosting and DVC remote storage.
 
-4. Select the `main` branch.
+### Why DagsHub?
 
-5. Set the application entry point to:
+Machine learning projects often involve datasets that are too large or change too frequently to manage efficiently using ordinary Git commits alone.
 
-   ```text
-   src/app/app.py
-   ```
+DagsHub and DVC separate source-code version control from dataset storage, making it easier to retrieve the data associated with a particular version of the project.
 
-6. Configure any required secrets or credentials through the deployment platform's secrets settings.
+### How DagsHub Is Used
 
-7. Deploy the application and inspect the logs if dependency installation or data loading fails.
+**1. Git Repository Hosting**
 
-**Deployment note:** The repository must contain or successfully retrieve every runtime dataset needed by the app. Cloud instances may also have limited memory and storage, so OCR and PyTorch dependency installation should be tested on the target platform.
+The project source code and Git commit history are synchronized with the DagsHub repository.
 
-## 🧪 Run Tests
+Repository: [Smart Grocery Rescue on DagsHub](https://dagshub.com/Meena/smart-grocery-rescue-mlops)
+
+**2. DVC Remote Storage**
+
+DVC metadata files describe the versioned datasets. The actual dataset contents are stored in the configured DVC remote.
+
+Configured remote endpoint:
+
+```text
+https://dagshub.com/Meena/smart-grocery-rescue-mlops.dvc
+```
+
+**3. Dataset Versioning**
+
+DVC tracks dataset versions independently of ordinary Git files. This helps reproduce preprocessing and training workflows using the corresponding data versions.
+
+**4. Experiment-Tracking Workflows**
+
+The project includes MLflow training scripts. Remote MLflow tracking through DagsHub requires the tracking server and credentials to be configured separately.
+
+### Useful DVC Commands
+
+List configured remotes:
+
+```bash
+dvc remote list
+```
+
+Check cache and remote synchronization:
+
+```bash
+dvc status -c
+```
+
+Download versioned datasets:
+
+```bash
+dvc pull -r origin
+```
+
+Upload updated datasets:
+
+```bash
+dvc push -r origin
+```
+
+### Git Remotes and DVC Remotes
+
+The project uses two Git remotes:
+
+| Remote | Purpose |
+|---|---|
+| `origin` | GitHub repository |
+| `dagshub` | DagsHub Git repository |
+
+The DVC remote is separately configured with the name `origin` and points to the DagsHub `.dvc` endpoint.
+
+Consequently:
+
+```bash
+git push origin main
+```
+
+pushes Git commits to GitHub, while:
+
+```bash
+git push dagshub main
+```
+
+pushes Git commits to DagsHub.
+
+By contrast:
+
+```bash
+dvc push -r origin
+```
+
+uploads tracked dataset objects to the configured DVC remote.
+
+These operations are separate: pushing Git commits does not automatically upload missing DVC objects.
+
+---
+
+## 📊 9. MLflow Experiment Tracking
+
+[MLflow](https://mlflow.org/) supports tracking machine learning experiments, including parameters, evaluation metrics, and artifacts.
+
+The project includes an MLflow-oriented training workflow in `src/models/train_mlflow.py`.
+
+### Run the Training Workflow
+
+```bash
+python src/models/train_mlflow.py
+```
+
+Review the script's configuration before execution to ensure the required dataset paths and tracking settings are correct.
+
+### Launch the Local MLflow UI
+
+```bash
+mlflow ui --port 5000
+```
+
+Open:
+
+http://localhost:5000
+
+A local tracking server provides a convenient way to inspect experiments recorded in the configured local backend.
+
+**Note:** Remote experiment tracking is a separate configuration step. Do not assume that experiments are visible in DagsHub merely because the Git repository and DVC remote are hosted there.
+
+---
+
+## 🔄 10. MLOps Pipeline
+
+The project follows a practical MLOps workflow.
+
+| Stage | Tool or Component | Purpose |
+|---|---|---|
+| Data ingestion | Python scripts | Load source datasets |
+| Data preprocessing | Pandas | Clean and transform datasets |
+| Dataset versioning | DVC | Track dataset versions |
+| Remote data storage | DagsHub | Store DVC-managed data |
+| Model training | Scikit-learn | Train waste-risk classifiers |
+| Experiment tracking | MLflow | Record experiments when configured |
+| Source control | Git and GitHub | Manage application versions |
+| Continuous integration | GitHub Actions | Run automated checks |
+| Testing | pytest | Validate application components |
+| Containerization | Docker | Package the runtime |
+| Application interface | Streamlit | Provide interactive access |
+
+### GitHub Actions CI
+
+The project's GitHub Actions workflow is configured to run when changes are pushed to `main` or when a pull request targets `main`.
+
+The workflow installs dependencies, configures access to the DVC remote, retrieves versioned data, and runs the automated tests.
+
+Required DagsHub credentials should be stored in GitHub Actions repository secrets rather than hard-coded into the workflow.
+
+---
+
+## 🧪 11. Testing
 
 Run the automated test suite:
 
@@ -340,93 +535,107 @@ Run the automated test suite:
 pytest tests/ -v
 ```
 
-The test suite covers:
+The tests cover:
 
-- Shelf-life calculations and food normalization
-- Feedback handling
+- Shelf-life calculations
+- Feedback management
 - Nutrition lookup and fallback behavior
 - Receipt parsing
 - Recipe recommendation scoring
 
-The local development test run recorded **7 passing tests**. Run the tests again after any changes to verify the current state.
+**Recorded local test result:** 7 tests passed in 1.99 seconds during development.
 
-## 📈 Model Training
+This result reflects that particular test run. Run the tests again after modifying the application or its dependencies.
 
-To train the waste-risk classification model:
+---
+
+## 🤖 12. Model Training
+
+The project includes scripts for dataset preparation and model training.
+
+### Prepare the Waste-Risk Dataset
+
+Run the preprocessing scripts in the required order, ensuring their input datasets are available:
+
+```bash
+python src/preprocessing/preprocess_data.py
+python src/preprocessing/preprocess_nutrition.py
+python src/preprocessing/preprocess_shelf_life.py
+python src/preprocessing/create_ml_dataset.py
+```
+
+### Train the Model
 
 ```bash
 python src/models/train_model.py
 ```
 
-The training pipeline compares multiple Scikit-learn classifiers and saves the selected model and evaluation outputs according to the script configuration.
+The training script evaluates the configured classifiers and saves the selected model and results according to its implementation.
 
-For MLflow-based experiment workflows, inspect and run the relevant script:
+### Run the MLflow Training Workflow
 
 ```bash
 python src/models/train_mlflow.py
 ```
 
-MLflow tracking requires a correctly configured tracking URI and backend. For a local tracking UI, use:
+Review the script's input paths, tracking configuration, and output destinations before running it.
 
-```bash
-mlflow ui --port 5000
-```
+---
 
-Then open `http://localhost:5000`.
+## 🔐 13. Security and Data Management
 
-## 🔄 MLOps Workflow
+- Never commit DagsHub tokens, passwords, or other credentials.
+- Store secrets in environment variables or the relevant platform's secret manager.
+- Keep virtual environments, temporary files, and unnecessary generated artifacts out of Git.
+- Use DVC for datasets that should not be committed as ordinary Git files.
+- Verify `.gitignore` and `.dockerignore` before pushing or building.
+- Use persistent storage for inventory and feedback in environments where the local filesystem is ephemeral.
+- Restrict access to private datasets and credentials.
 
-The project follows a practical MLOps-oriented workflow:
+---
 
-1. **Data ingestion:** Collect grocery, recipe, nutrition, and shelf-life datasets.
-2. **Data preprocessing:** Clean and transform raw datasets into usable CSV files.
-3. **Data versioning:** Track dataset versions with DVC and store managed data in the configured remote.
-4. **Model training:** Train and evaluate waste-risk classifiers.
-5. **Experiment tracking:** Use the project's MLflow workflows to record model experiments when configured.
-6. **Automated testing:** Run pytest tests through the development and CI workflow.
-7. **Containerization:** Package the application with Docker.
-8. **Deployment:** Run the Streamlit application locally or deploy it to a compatible hosting platform.
+## 🚀 14. Future Enhancements
 
-## 🔐 Configuration and Data Management
+- Improve OCR accuracy for different receipt formats.
+- Add barcode scanning and stronger product-name normalization.
+- Add database-backed inventory persistence.
+- Improve waste-risk model evaluation with larger, representative datasets.
+- Introduce model versioning and automated model evaluation.
+- Extend CI to include Docker build validation.
+- Add scheduled notifications for groceries approaching expiry.
+- Expand nutrition and recipe coverage.
+- Add deployment health checks, monitoring, and structured logging.
+- Configure and validate remote MLflow tracking.
 
-- Keep API keys, access tokens, and credentials out of Git.
-- Use environment variables or platform secrets for sensitive configuration.
-- Keep large raw datasets and model artifacts out of ordinary Git commits when managed through DVC.
-- Avoid committing virtual environments, cache directories, and temporary experiment outputs.
-- Use persistent storage for inventory and feedback if deployed in an environment with an ephemeral filesystem.
-- Review the repository's `.gitignore`, `.dockerignore`, and DVC configuration before publishing.
+---
 
-## 🔮 Future Enhancements
-
-- Improve OCR accuracy for different receipt formats and currencies.
-- Add barcode scanning and more robust product-name matching.
-- Introduce user accounts and persistent database storage.
-- Improve waste-risk predictions with more representative real-world data.
-- Add automated model evaluation and model-version promotion.
-- Expand CI/CD to include container build verification and deployment checks.
-- Add scheduled notifications for expiring groceries.
-- Enhance recipe recommendations with dietary preferences and nutritional constraints.
-- Improve monitoring and logging for deployed application errors.
-
-## 🎓 Learning Outcomes
+## 🎓 15. Learning Outcomes
 
 This project demonstrates practical experience with:
 
 - Python application development
 - OCR and text processing
-- Machine learning model development and evaluation
-- Data preprocessing and versioning
-- Experiment-tracking workflows
-- Automated unit testing
-- Git-based collaboration and CI
+- Machine learning classification
+- Data preprocessing and dataset management
+- DVC-based data versioning
+- DagsHub integration
+- MLflow experiment-tracking workflows
+- Automated testing with pytest
+- Git-based version control
+- GitHub Actions CI
 - Docker containerization
-- Streamlit application deployment
+- Streamlit deployment
 
-## 👩‍💻 Author
+---
+
+## 👩‍💻 16. Author
 
 **Meenarekha E**
 
-Artificial Intelligence and Data Science | MLOps | Machine Learning | Python
+Artificial Intelligence and Data Science | Machine Learning | MLOps
 
-- GitHub: [Meenarekha](https://github.com/Meenarekha)
-- Project Repository: [Smart Grocery Rescue MLOps](https://github.com/Meenarekha/smart-grocery-rescue-mlops)
+- **GitHub:** [Meenarekha](https://github.com/Meenarekha)
+- **Project Repository:** [Smart Grocery Rescue MLOps](https://github.com/Meenarekha/smart-grocery-rescue-mlops)
+- **DagsHub:** [Smart Grocery Rescue](https://dagshub.com/Meena/smart-grocery-rescue-mlops)
+
+---
