@@ -12,6 +12,11 @@
 **Repository:** [GitHub](https://github.com/Meenarekha/smart-grocery-rescue-mlops) | **MLOps Platform:** [DagsHub](https://dagshub.com/Meena/smart-grocery-rescue-mlops)
 
 ---
+## 🚀 Live Demo
+
+**Try the application:** [Smart Grocery Rescue — Live App](https://smart-grocery-rescue-mlops-84guujzfxv6oktotzfdfqk.streamlit.app/)
+
+Explore grocery inventory management, receipt scanning, expiry monitoring, nutrition estimation, and expiry-aware recipe recommendations.
 
 ## 📌 1. Project Overview
 
