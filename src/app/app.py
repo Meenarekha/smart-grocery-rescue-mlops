@@ -83,7 +83,7 @@ FEEDBACK_FILE = (
 # ---------------------------------------------------------------------------
 # DVC / DagsHub Deployment Bootstrap
 # ---------------------------------------------------------------------------
-
+@st.cache_resource(show_spinner="Preparing application data...")
 def ensure_processed_data():
     """
     Ensure DVC-managed processed datasets are available.
