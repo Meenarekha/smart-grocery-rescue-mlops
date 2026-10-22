@@ -55,7 +55,6 @@ from src.expiry.shelf_life import (
 
 from src.feedback.feedback_manager import FeedbackManager
 from src.nutrition.nutrition_service import NutritionService
-from src.ocr.receipt_ocr import extract_text
 from src.ocr.receipt_parser import parse_receipt_items
 from src.recommendation.recipe_recommender import RecipeRecommender
 
@@ -286,18 +285,33 @@ ensure_processed_data()
 
 
 # ---------------------------------------------------------------------------
-# Initialize Services
+# Cached service initialization
 # ---------------------------------------------------------------------------
 
-shelf_life_df = load_shelf_life_data()
+@st.cache_data(show_spinner=False)
+def get_shelf_life_data():
+    return load_shelf_life_data()
 
-recommender = RecipeRecommender()
 
-nutrition_service = NutritionService()
+@st.cache_resource(show_spinner="Loading recipe recommendations...")
+def get_recommender():
+    return RecipeRecommender()
 
-feedback_manager = FeedbackManager(
-    str(FEEDBACK_FILE)
-)
+
+@st.cache_resource(show_spinner=False)
+def get_nutrition_service():
+    return NutritionService()
+
+
+@st.cache_resource(show_spinner=False)
+def get_feedback_manager(feedback_path: str):
+    return FeedbackManager(feedback_path)
+
+
+shelf_life_df = get_shelf_life_data()
+recommender = get_recommender()
+nutrition_service = get_nutrition_service()
+feedback_manager = get_feedback_manager(str(FEEDBACK_FILE))
 
 
 # ---------------------------------------------------------------------------
@@ -1074,12 +1088,12 @@ elif app_mode == "Receipt Scanner":
                 "Processing OCR text..."
             ):
 
-                # EasyOCR works with numpy arrays
-                image_array = np.array(img)
+                # Load OCR only when the user clicks Analyze Receipt.
+                # The OCR reader is cached by src/ocr/receipt_ocr.py.
+                from src.ocr.receipt_ocr import extract_text
 
-                ocr_results = extract_text(
-                    image_array
-                )
+                image_array = np.array(img)
+                ocr_results = extract_text(image_array)
 
                 # Parse OCR results
                 parsed_groceries = parse_receipt_items(

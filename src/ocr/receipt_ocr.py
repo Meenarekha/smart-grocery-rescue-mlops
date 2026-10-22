@@ -1,50 +1,54 @@
-import easyocr
+"""
+Receipt OCR service for Smart Grocery Rescue.
+
+EasyOCR is imported only when receipt scanning is requested. The reader is
+cached so it is not initialized again on every Streamlit rerun.
+"""
+
+from functools import lru_cache
 
 
-# Initialize EasyOCR
-reader = easyocr.Reader(["en"])
+@lru_cache(maxsize=1)
+def _get_reader():
+    """Create and reuse a single English EasyOCR reader."""
+    import easyocr
+
+    return easyocr.Reader(["en"], gpu=False)
 
 
 def extract_text(image_path, min_confidence=0.40):
     """
-    Extract text from a receipt image using EasyOCR.
+    Extract receipt text using EasyOCR.
 
-    Parameters:
-        image_path (str): Path to the receipt image.
-        min_confidence (float): Minimum OCR confidence required.
-
-    Returns:
-        list: Extracted text with confidence scores.
+    image_path may be a file path or an image input accepted by EasyOCR,
+    including a NumPy array.
     """
+    if not 0 <= min_confidence <= 1:
+        raise ValueError("min_confidence must be between 0 and 1")
 
+    reader = _get_reader()
     results = reader.readtext(image_path)
 
     extracted_text = []
-
     for _, text, confidence in results:
-
-        # Keep only reasonably confident OCR results
+        confidence = float(confidence)
         if confidence >= min_confidence:
-
-            extracted_text.append({
-                "text": text.strip(),
-                "confidence": round(float(confidence), 4)
-            })
+            cleaned_text = str(text).strip()
+            if cleaned_text:
+                extracted_text.append({
+                    "text": cleaned_text,
+                    "confidence": round(confidence, 4),
+                })
 
     return extracted_text
 
 
 if __name__ == "__main__":
+    import sys
 
-    image_path = "receipt 2.png"
+    if len(sys.argv) < 2:
+        print("Usage: python -m src.ocr.receipt_ocr <receipt-image-path>")
+        raise SystemExit(2)
 
-    results = extract_text(image_path)
-
-    print("\nExtracted Receipt Text:")
-    print("-" * 40)
-
-    for item in results:
-        print(
-            f"{item['text']} "
-            f"(confidence: {item['confidence']})"
-        )
+    for item in extract_text(sys.argv[1]):
+        print(f"{item['text']} (confidence: {item['confidence']})")
